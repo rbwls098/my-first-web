@@ -9,6 +9,13 @@
 !/docs/
 !/practice/
 !/강의계획서.md
+!/app/
+!/public/
+!package.json
+!tsconfig.json
+!next.config.ts
+!postcss.config.mjs
+!eslint.config.mjs
 
 # ===================
 # Python
