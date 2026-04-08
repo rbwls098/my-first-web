@@ -1,4 +1,4 @@
-# Chapter 4. JavaScript 핵심 — A회차: 강의
+h f# Chapter 4. JavaScript 핵심 — A회차: 강의
 
 > **미션**: JavaScript로 페이지에 생명을 불어넣는다
 
