@@ -157,3 +157,5 @@ _archive/
 
 # docs chapter C 파일 제외
 docs/ch*C.md
+
+!/lib/
