@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { posts } from "@/lib/posts";
+import { Post } from "@/lib/posts";
 
 export default async function PostDetailPage({
   params,
@@ -7,9 +7,11 @@ export default async function PostDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const post = posts.find((post) => post.id === Number(id));
-
-  if (!post) {
+  
+  // JSONPlaceholder에서 개별 게시글 조회
+  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+  
+  if (!res.ok) {
     return (
       <div className="mt-8 text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -21,6 +23,15 @@ export default async function PostDetailPage({
       </div>
     );
   }
+
+  const data = await res.json();
+  const post: Post = {
+    id: data.id,
+    title: data.title,
+    content: data.body,
+    author: `User ${data.userId}`,
+    date: new Date().toISOString().split("T")[0],
+  };
 
   return (
     <article className="mt-8 bg-white p-6 rounded-lg shadow-md border border-gray-200">

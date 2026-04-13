@@ -3,16 +3,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+interface PostForm {
+  title: string;
+  content: string;
+}
+
 export default function NewPostPage() {
   const router = useRouter();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [form, setForm] = useState<PostForm>({ title: "", content: "" });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setForm({ ...form, [id]: value });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
+    if (!form.title.trim()) {
+      alert("제목을 입력해주세요");
+      return;
+    }
+    if (!form.content.trim()) {
+      alert("내용을 입력해주세요");
+      return;
+    }
     
-    alert("저장되었습니다");
+    alert("게시글이 저장되었습니다 (더미)");
     router.push("/posts");
   };
 
@@ -27,11 +43,10 @@ export default function NewPostPage() {
           <input
             id="title"
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={form.title}
+            onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="제목을 입력하세요"
-            required
           />
         </div>
         
@@ -41,12 +56,11 @@ export default function NewPostPage() {
           </label>
           <textarea
             id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={form.content}
+            onChange={handleChange}
             rows={8}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
             placeholder="내용을 입력하세요"
-            required
           />
         </div>
 
