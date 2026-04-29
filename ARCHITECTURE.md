@@ -36,7 +36,69 @@ Next.js App Router 기반의 라우팅 구조입니다.
 ---
 
 ## 4. 컴포넌트 구조
-> TODO: 컴포넌트 구조 (shadcn/ui 설치 후 추가 예정)
+
+### 4.1. 레이아웃 컴포넌트
+- **Header**: 로고, 네비게이션 메뉴, 사용자 정보
+- **Footer**: 사이트 정보, 링크
+- **MainLayout**: Header + 콘텐츠 영역 + Footer
+
+### 4.2. shadcn/ui 컴포넌트 활용
+
+| 페이지 | 주요 컴포넌트 | 용도 |
+| --- | --- | --- |
+| 홈 (`/`) | Card, Button | 글 목록 카드화, 글쓰기 버튼 |
+| 글 상세 (`/posts/[id]`) | Card, Button | 글 본문 표시, 수정/삭제 버튼 |
+| 글 작성 (`/posts/new`) | Input, Button, Dialog | 제목/본문 입력, 저장 버튼, 확인 다이얼로그 |
+| 마이페이지 (`/mypage`) | Card, Button | 프로필 정보 표시, 설정 버튼 |
+
+### 4.3. 커스텀 컴포넌트
+- **PostCard**: 글 목록에서 사용하는 카드 (shadcn/ui Card 래핑)
+- **PostList**: 글 목록 배열 렌더링
+- **Navigation**: 헤더 네비게이션 (shadcn/ui 컴포넌트 조합)
 
 ## 5. 데이터 모델
-> TODO: 데이터 모델 (Ch8 대비 후 추가 예정)
+
+### 5.1. profiles (사용자 프로필)
+
+```
+profiles
+├── id: uuid (PK, auth.users 참조)
+├── username: text (사용자명)
+├── avatar_url: text (프로필 이미지 URL)
+├── bio: text (간단한 소개)
+├── role: varchar (기본값: 'user', 가능값: 'user', 'admin')
+└── created_at: timestamptz (프로필 생성일)
+```
+
+### 5.2. posts (블로그 포스트)
+
+```
+posts
+├── id: uuid (PK)
+├── user_id: uuid (FK → profiles.id)
+├── title: text (포스트 제목)
+├── content: text (포스트 본문)
+├── excerpt: text (포스트 요약)
+├── published: boolean (발행 상태, 기본값: true)
+├── created_at: timestamptz (작성일)
+├── updated_at: timestamptz (수정일)
+└── views: integer (조회수, 기본값: 0)
+```
+
+### 5.3. 관계 구조
+
+```
+profiles (1) ──→ (N) posts
+  users          (user_id FK)
+```
+
+- 한 사용자가 여러 개의 포스트 작성 가능
+- posts.user_id는 profiles.id를 참조하는 외래키
+- 사용자 삭제 시 RESTRICT (포스트 먼저 삭제 필요)
+
+### 5.4. 데이터 흐름
+
+1. **포스트 작성**: 사용자가 `/posts/new`에서 제목과 본문 입력 → posts 테이블에 저장
+2. **포스트 조회**: 홈(`/`)에서 posts 테이블의 모든 글 조회 → Card로 렌더링
+3. **상세 조회**: `/posts/[id]`에서 특정 post 조회 → 해당 user_id로 작성자 정보 조회
+4. **마이페이지**: 로그인한 사용자의 profile 정보 및 본인이 작성한 posts 조회

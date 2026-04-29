@@ -1,24 +1,59 @@
-# Context — my-first-web 프로젝트 상태
+# TODO — my-first-web
 
-## 현재 상태
+## 1단계: 기본 구조 & 아키텍처 설계 (Ch7~8)
 
-- 마지막 작업일: 2026-02-26
-- 완료된 작업: 홈 페이지, 헤더/푸터 레이아웃, 포스트 목록
-- 진행 중: 포스트 상세 페이지 (UI 완료, 데이터 연결 미완)
-- 미착수: 마이페이지
+- [x] ARCHITECTURE.md 뼈대 작성 (페이지 맵, 유저 플로우)
+- [x] ARCHITECTURE.md 완성 (컴포넌트 구조, 데이터 모델)
+- [x] .github/copilot-instructions.md 작성 (Tech Stack, Conventions, Design Tokens)
+- [x] context.md 작성 (프로젝트 상태, 기술 결정, 이슈 해결)
+- [x] todo.md 작성 (작업 체크리스트)
+- [x] shadcn/ui 초기화 (`npx shadcn init`)
+- [x] shadcn/ui 컴포넌트 설치 (Button, Card, Input, Dialog)
+- [x] 헤더/푸터 레이아웃
+- [x] 홈 페이지 (`/`)
+- [x] 포스트 목록 페이지 (`/posts`)
+- [x] 포스트 상세 페이지 (`/posts/[id]`)
+- [ ] Supabase 프로젝트 생성
+- [ ] 데이터베이스 스키마 작성 (profiles, posts 테이블)
 
-## 기술 결정 사항
+## 2단계: 데이터 연동 & 인증 (Ch8~9)
 
-- 인증: Supabase Auth (Email)
-- 상태관리: React Context (AuthProvider)
-- 이미지: Supabase Storage 사용 예정
+- [ ] Supabase 연결 설정
+- [ ] posts 테이블에서 데이터 조회 로직
+- [ ] 포스트 목록 페이지 동적 렌더링
+- [ ] 포스트 상세 페이지 동적 렌더링
+- [ ] 포스트 작성 페이지 (`/posts/new`) 구현
+- [ ] 포스트 생성 API 연결
+- [ ] Supabase Auth 로그인 구현
+- [ ] 회원가입 페이지 (`/signup`)
+- [ ] 인증 상태 관리 (AuthProvider)
 
-## 해결된 이슈
+## 3단계: CRUD & 사용자 기능 (Ch10~11)
 
-- shadcn/ui Button variant가 디자인 토큰과 불일치 → globals.css의 --primary 수정으로 해결
-- 모바일 헤더 메뉴가 겹침 → Sheet 컴포넌트로 교체
+- [ ] 포스트 수정 기능 (`/posts/[id]/edit`)
+- [ ] 포스트 삭제 기능
+- [ ] 마이페이지 (`/mypage`) - 프로필 정보 조회
+- [ ] 마이페이지 - 내가 작성한 글 목록
+- [ ] 프로필 수정 기능
+- [ ] RLS (Row Level Security) 설정
 
-## 알게 된 점
+## 4단계: 고급 기능 (Ch12)
 
-- Tailwind CSS 4 기준에서는 `@import "tailwindcss"` + `@theme` 블록으로 설정 (`tailwind.config.js` 불필요)
-- Server Component에서 useRouter 사용 불가 → redirect() 사용
+- [ ] 댓글 기능 (comments 테이블)
+- [ ] 좋아요 기능 (likes 테이블)
+- [ ] 검색 기능
+- [ ] 태그 기능
+
+## 5단계: 배포 & 최적화
+
+- [ ] 성능 최적화 (이미지 최적화, 캐싱)
+- [ ] SEO 최적화
+- [ ] Vercel 배포
+- [ ] 모니터링 설정
+
+---
+
+## 진행률: 13/30 (43%)
+
+**완료된 항목**: 1~8단계 (기본 구조)
+**진행 예상**: Ch8에서 Supabase 연동 시작
