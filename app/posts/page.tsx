@@ -7,6 +7,7 @@ export default async function PostsPage() {
   const data = await res.json();
   
   // JSONPlaceholder의 데이터를 우리 Post 타입에 맞게 매핑
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fetchedPosts: Post[] = data.map((item: any) => ({
     id: item.id,
     title: item.title,
