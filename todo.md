@@ -13,20 +13,20 @@
 - [x] 홈 페이지 (`/`)
 - [x] 포스트 목록 페이지 (`/posts`)
 - [x] 포스트 상세 페이지 (`/posts/[id]`)
-- [ ] Supabase 프로젝트 생성
-- [ ] 데이터베이스 스키마 작성 (profiles, posts 테이블)
+- [x] Supabase 프로젝트 생성
+- [x] 데이터베이스 스키마 작성 (profiles, posts 테이블)
 
-## 2단계: 데이터 연동 & 인증 (Ch8~9)
+## 2단계: Supabase Auth 인증 구현 (Ch9)
 
-- [ ] Supabase 연결 설정
-- [ ] posts 테이블에서 데이터 조회 로직
-- [ ] 포스트 목록 페이지 동적 렌더링
-- [ ] 포스트 상세 페이지 동적 렌더링
-- [ ] 포스트 작성 페이지 (`/posts/new`) 구현
-- [ ] 포스트 생성 API 연결
-- [ ] Supabase Auth 로그인 구현
-- [ ] 회원가입 페이지 (`/signup`)
-- [ ] 인증 상태 관리 (AuthProvider)
+- [ ] middleware.ts 작성 (라우트 보호)
+- [ ] AuthProvider 컨텍스트 생성 (lib/contexts/ 또는 app/providers.tsx)
+- [ ] 로그인 페이지 (`/login`) 구현
+- [ ] 회원가입 페이지 (`/signup`) 구현
+- [ ] 로그아웃 기능 구현
+- [ ] signInWithPassword 로그인 로직
+- [ ] AuthContext 훅 (useAuth) 작성
+- [ ] Header에 인증 상태 반영 (로그인/로그아웃 버튼)
+- [ ] 세션 지속성 설정 (@supabase/ssr)
 
 ## 3단계: CRUD & 사용자 기능 (Ch10~11)
 
@@ -53,7 +53,7 @@
 
 ---
 
-## 진행률: 13/30 (43%)
+## 진행률: 14/35 (40%)
 
-**완료된 항목**: 1~8단계 (기본 구조)
-**진행 예상**: Ch8에서 Supabase 연동 시작
+**완료된 항목**: Ch7~Ch8 (기본 구조, 데이터베이스 설정)
+**진행 예상**: Ch9에서 Supabase Auth 인증 구현 시작
