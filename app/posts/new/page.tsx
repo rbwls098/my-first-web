@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -49,18 +49,43 @@ export default function NewPostPage() {
     setErrorMsg(null);
     
     try {
+      // 1. 프로필이 존재하는지 먼저 확인하고, 없으면 생성 (Foreign Key 에러 방지)
+      const { data: profile, error: profileCheckError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (profileCheckError || !profile) {
+        // 프로필이 없으면 현재 유저 정보를 바탕으로 생성
+        const { error: profileCreateError } = await supabase
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            username: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+          });
+        
+        if (profileCreateError) {
+          console.error("Failed to sync profile:", profileCreateError);
+          // 프로필 생성이 실패해도 일단 진행 (RLS 등에 의해 이미 존재할 수도 있음)
+        }
+      }
+
       // 2. posts 테이블에 insert
       const { data, error } = await supabase
         .from("posts")
         .insert({
           title: form.title,
           content: form.content,
-          user_id: user.id, // 1. Ch9 AuthContext에서 가져온 user.id 사용
+          user_id: user.id,
         })
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
+      }
       
       // 글 작성 성공 후 목록이나 상세 페이지로 이동
       router.push(`/posts/${data.id}`);
@@ -68,7 +93,10 @@ export default function NewPostPage() {
       
     } catch (err: any) {
       console.error("Error submitting post:", err);
-      setErrorMsg(err.message || "게시글 저장 중 오류가 발생했습니다.");
+      const errorMessage = err.message || "게시글 저장 중 오류가 발생했습니다.";
+      const errorDetail = err.details ? ` (Detail: ${err.details})` : "";
+      const errorHint = err.hint ? ` (Hint: ${err.hint})` : "";
+      setErrorMsg(`${errorMessage}${errorDetail}${errorHint}`);
     } finally {
       setIsSubmitting(false);
     }
