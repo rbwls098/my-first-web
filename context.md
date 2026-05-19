@@ -1,4 +1,4 @@
-﻿# Context — my-first-web 프로젝트 상태
+# Context — my-first-web 프로젝트 상태
 
 ## 현재 상태
 
@@ -7,7 +7,7 @@
   - 홈 페이지, 헤더/푸터 레이아웃, 포스트 목록 설정 (Ch7)
   - Supabase 프로젝트 생성 및 마이그레이션 적용 (Ch8)
   - Supabase Auth 인증 구현 (로그인/회원가입, AuthProvider) (Ch9)
-  - Supabase CRUD 구현 및 권한 검증, 빌드 경고 해결(proxy.ts 전환) (Ch10)
+  - Supabase CRUD 구현 및 권한 검증 (Ch10)
 - 진행 중: RLS(Row Level Security) 설정 (Ch11)
 - 미착수: 덧글/좋아요 기능(Ch12), 스토리지 추가(Ch13)
 
@@ -20,9 +20,30 @@
 - 컴포넌트 라이브러리: shadcn/ui (복사형, components/ui/에 설치)
 - 디자인: Tailwind CSS 4 + 디자인 토큰
 
-## Ch10 Supabase CRUD 진행 상황
+## Ch10 Supabase CRUD 구현 상세
 
-### 환경 설정 및 버전 관리
+### 파일 목록 및 역할
+- `app/posts/page.tsx`: 게시글 목록 (Server Component)
+- `app/posts/[id]/page.tsx`: 게시글 상세 (Server Component)
+- `app/posts/new/page.tsx`: 게시글 작성 (Client Component)
+- `app/posts/[id]/edit/page.tsx`: 게시글 수정 (Client Component)
+- `app/posts/[id]/PostActions.tsx`: 수정/삭제 버튼 제어 (Client Component)
+- `lib/supabase/server.ts`: 서버 사이드 Supabase 클라이언트 (createServerClient)
+- `lib/supabase/client.ts`: 클라이언트 사이드 Supabase 클라이언트 (createBrowserClient)
+
+### Supabase 쿼리 패턴
+- **목록 조회**: `supabase.from("posts").select("id, title, content, created_at, user_id").order("created_at", { ascending: false })`
+- **단건 조회**: `supabase.from("posts").select("*").eq("id", id).single()`
+- **생성**: `supabase.from("posts").insert({ title, content, user_id: user.id })`
+- **수정**: `supabase.from("posts").update({ title, content }).eq("id", id)`
+- **삭제**: `supabase.from("posts").delete().eq("id", id)`
+
+### 보안 및 UX 정책
+- **작성자 UI 분기**: `user.id === post.user_id`를 비교하여 수정/삭제 버튼 노출 여부 결정.
+- **실제 보안**: 현재 클라이언트 UI 분기는 UX용이며, 실제 DB 보호는 Ch11 RLS에서 정책(Policy)으로 처리할 예정.
+- **예외 처리**: 게시글 작성 전 `profiles` 존재 여부를 확인하고, 없을 경우 자동 생성(`upsert`)하여 참조 무결성 오류(Foreign Key Error) 방지.
+
+## 환경 설정 및 버전 관리
 **교재 기준**
 - Next.js 16.2.1
 - @supabase/supabase-js 2.47.12
@@ -34,15 +55,3 @@
 - @supabase/ssr 0.10.2
 
 *정책*: 수업 프롬프트와 설명은 교재 기준으로 통일. 버전 차이(특히 패키지 버전상 차이)로 인한 오류가 생긴다면 버전 차이를 감안하여 대응한다.
-
-### 구현 표준
-- **데이터 모델**: posts (id, user_id, title, content, created_at)
-- **Supabase 클라이언트**: Ch8에서 설정한 lib/supabase/client.ts 만 사용.
-- **인증 연동**: useAuth / AuthProvider 를 사용하여 로그인 된 사용자 정보(user.id)를 기반으로 글 작성(Create) 수행.
-- **라우터**: App Router 전용 (next/navigation만 사용, next/router 금지).
-- **보안 vs UX**: 본 장에서는 작성자에게만 수정/삭제 버튼이 보이도록 클라이언트 UI 단에서 분기. 실제 보안은 Ch11의 RLS로 통제할 예정임.
-
-### 주의사항
-- posts DB 컬럼명 임의 변경 금지
-- 생성 시 user_id를 입력 폼으로 받지 않고, user.id에서 가져와서 처리
-- 수정/삭제 시 .eq("id", postId) 조건식 누락 주의

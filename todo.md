@@ -28,6 +28,6 @@ px shadcn init\) 및 컴포넌트 설치
 - [ ] 검색/태그 기능
 
 ## 5단계: 배포 & 최적화
-- [ ] 빌드 검증 (\
-pm run build\)
-- [ ] Vercel 배포
+- [x] 빌드 검증 (npm run build)
+- [x] Vercel 배포
+

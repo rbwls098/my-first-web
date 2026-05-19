@@ -2,13 +2,13 @@
 
 ## Tech Stack
 
-### 교재 기준 (Ch9)
+### 교재 기준 (Ch10)
 - Next.js 16.2.1 (App Router only)
 - React 19.2.4
 - TypeScript
 - Tailwind CSS 4
 - shadcn/ui (components/ui/ 경로에 설치됨)
-- Supabase (PostgreSQL, Auth)
+- Supabase (PostgreSQL, Auth, RLS)
 - @supabase/supabase-js 2.47.12
 - @supabase/ssr 0.5.2
 
@@ -23,7 +23,7 @@
 
 ## Coding Conventions
 
-- Default to Server Components unless a Client Component is required
+- Default to Server Components unless a Client Component is required (e.g., /posts, /posts/[id] are Server Components)
 - Use Tailwind CSS for styling
 - Keep components simple and easy to verify
 - Prefer files inside `app/` for routes
@@ -37,7 +37,6 @@
 - Card: shadcn/ui Card 컴포넌트 사용 (rounded-lg shadow-sm)
 - Spacing: 컨텐츠 간격 space-y-6, 카드 내부 p-6
 - Max width: max-w-4xl mx-auto (메인 컨텐츠)
-- 반응형: md 이상 2열 그리드, 모바일 1열
 - Border radius: rounded-lg (카드, 버튼 기본값)
 
 ## Component Rules
@@ -46,43 +45,24 @@
 - Button, Card, Input, Dialog 등 shadcn/ui 컴포넌트 우선
 - 커스텀 컴포넌트는 components/ 루트에 배치
 - Tailwind 기본 컬러 직접 사용 금지 → CSS 변수(디자인 토큰) 사용
-- 모든 상호작용 요소는 shadcn/ui 컴포넌트 활용
 
-## Supabase Auth Rules (Ch9)
+## Supabase CRUD Rules (Ch10)
 
-### 인증 메커니즘
-- **인증 방식**: 이메일/비밀번호만 사용 (signInWithPassword)
-- **라우트 보호**: middleware.ts 사용 (인증 필요 페이지 접근 제어)
-- **세션 관리**: @supabase/ssr으로 쿠키 기반 세션 유지
-- **상태관리**: React Context + AuthProvider (전역 인증 상태)
+### 데이터 모델 및 쿼리
+- **컬럼명 고정**: `posts` 테이블의 컬럼명(`id`, `user_id`, `title`, `content`, `created_at`)을 임의로 변경하거나 다른 이름(authorId, body 등)을 사용하지 마십시오.
+- **서버 클라이언트**: 서버 컴포넌트에서는 `lib/supabase/server.ts`의 `createClient`를 `await`하여 사용하십시오.
+- **클라이언트 클라이언트**: 클라이언트 컴포넌트에서는 `lib/supabase/client.ts`의 `createClient`를 사용하십시오.
+- **Foreign Key 관리**: 게시글 작성 시 `profiles` 테이블에 해당 `user.id`가 존재하는지 확인하고, 없을 경우 `upsert` 로직을 포함하여 참조 무결성 오류를 방지하십시오.
 
-### 구현 표준
-- **로그인 함수**: `client.auth.signInWithPassword()` 사용
-- **회원가입 함수**: `client.auth.signUp()` 사용
-- **로그아웃 함수**: `client.auth.signOut()` 사용
-- **현재 세션**: `client.auth.getSession()` 또는 `client.auth.getUser()` 사용
-
-### 금지 사항
-- ❌ 구버전 `auth.signIn()` 미사용
-- ❌ 소셜 로그인 (Google, GitHub 등) 미구현
-- ❌ service_role 키는 클라이언트에 절대 미포함
-- ❌ Pages Router, next/router, pages/ 디렉토리 미사용
-
-### 환경변수
-```
-NEXT_PUBLIC_SUPABASE_URL=<프로젝트 URL>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<익명 키>
-```
+### 보안 및 권한
+- **UI 분기**: 작성자 본인 확인은 `user.id === post.user_id` 조건을 사용하십시오.
+- **보안**: `service_role` 키는 서버 환경변수로만 관리하며, 브라우저/클라이언트 코드에 절대 포함하거나 노출하지 마십시오.
+- **RLS**: 실제 데이터 보안은 Ch11 RLS 정책에서 처리함을 명시하십시오.
 
 ## Known AI Mistakes
 
-- Do not use `next/router`; use `next/navigation` when navigation is needed
-- Do not create `pages/` router files; this project uses the App Router
-- Do not add `"use client"` unless interactivity or browser APIs are actually needed
-- Do not use hardcoded colors (like bg-blue-500); always use design tokens (like bg-primary)
-- Do not import from `components/ui/` without verifying the file exists
-- Do not use Pages Router pattern like `/pages/about.tsx`
-- **Auth**: Do not use `auth.signIn()`; use `auth.signInWithPassword()` instead
-- **Auth**: Do not add service_role key to client code
-- **Auth**: Do not implement social login; email/password only
-- **Routing**: Do not use `useRouter()` in Server Components; use `redirect()` or `middleware.ts` instead
+- **Routing**: 절대 `next/router`를 사용하지 마십시오. 항상 `next/navigation`의 `useRouter`, `usePathname`, `useParams`를 사용하십시오.
+- **Pages Router**: `pages/` 디렉토리를 생성하거나 관련 패턴을 사용하지 마십시오.
+- **Auth**: `auth.signIn()` 대신 `auth.signInWithPassword()`를 사용하십시오.
+- **Key Security**: `SUPABASE_SERVICE_ROLE_KEY`를 `NEXT_PUBLIC_` 접두사와 함께 사용하거나 클라이언트 측 파일에 작성하지 마십시오.
+- **SSR**: 서버 컴포넌트에서 `createClient()`를 호출할 때 `await`를 누락하지 마십시오.
