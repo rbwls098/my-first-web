@@ -1,12 +1,12 @@
-﻿import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 import { Post } from "@/lib/posts";
 import PostList from "@/components/PostList";
 
 export const revalidate = 0; // 최신 데이터 조회를 위해 캐시 비활성화 (선택 사항이지만 목록의 최신성을 보장하기 위함)
 
 export default async function PostsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: posts, error } = await supabase
     .from("posts")
     .select("id, title, content, created_at, user_id")

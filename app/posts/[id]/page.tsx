@@ -1,6 +1,6 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 
 import PostActions from "./PostActions";
 
@@ -13,7 +13,7 @@ export default async function PostDetailPage({
 }) {
   const { id } = await params;
   
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // 1. posts 테이블에서 id로 단일 데이터 조회 (조회할 컬럼 지정)
   const { data: post, error } = await supabase

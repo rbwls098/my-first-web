@@ -1,4 +1,4 @@
-﻿# TODO — my-first-web
+# TODO — my-first-web
 
 ## 1단계: 기본 구조 & 아키텍처 설계 (Ch7~8)
 - [x] ARCHITECTURE.md 뼈대 및 완경
@@ -15,11 +15,11 @@ px shadcn init\) 및 컴포넌트 설치
 - [x] 로그아웃 기능 구현 및 Header 상태 반영
 
 ## 3단계: CRUD & 사용자 기능 (Ch10~11)
-- [ ] 포스트 목록 데이터 연결 (\/posts\ Supabase Select)
-- [ ] 포스트 상세 데이터 연결 (\/posts/[id]\ Supabase Select 단건)
-- [ ] 신규 포스트 작성 기능 연결 (\/posts/new\ Supabase Insert)
-- [ ] 작성자 한정 포스트 수정/삭제 버튼 처리 (UX 분기)
-- [ ] 마이페이지 (\/mypage\) 구성 및 작성 글 목록 표시
+- [x] 포스트 목록 데이터 연결 (/posts/ Supabase Select)
+- [x] 포스트 상세 데이터 연결 (/posts/[id]/ Supabase Select 단건)
+- [x] 신규 포스트 작성 기능 연결 (/posts/new/ Supabase Insert)
+- [x] 작성자 한정 포스트 수정/삭제 버튼 처리 (UX 분기)
+- [ ] 마이페이지 (/mypage) 구성 및 작성 글 목록 표시
 - [ ] RLS (Row Level Security) 설정 (Ch11)
 
 ## 4단계: 고급 기능 (Ch12)
