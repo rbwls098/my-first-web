@@ -1,20 +1,28 @@
-import Link from "next/link";
+﻿import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import { Post } from "@/lib/posts";
 import PostList from "@/components/PostList";
 
+export const revalidate = 0; // 최신 데이터 조회를 위해 캐시 비활성화 (선택 사항이지만 목록의 최신성을 보장하기 위함)
+
 export default async function PostsPage() {
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts?_limit=10");
-  const data = await res.json();
-  
-  // JSONPlaceholder의 데이터를 우리 Post 타입에 맞게 매핑
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fetchedPosts: Post[] = data.map((item: any) => ({
-    id: item.id,
-    title: item.title,
-    content: item.body,
-    author: `User ${item.userId}`,
-    date: new Date().toISOString().split("T")[0],
-  }));
+  const supabase = createClient();
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("id, title, content, created_at, user_id")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold mb-6">게시글 목록</h1>
+        <p className="text-red-500">데이터를 가져오는 중 오류가 발생했습니다: {error.message}</p>
+      </div>
+    );
+  }
+
+  // Type assertion since our query selects exactly these fields
+  const fetchedPosts: Post[] = posts || [];
 
   return (
     <div>
@@ -27,7 +35,12 @@ export default async function PostsPage() {
           새 글 작성
         </Link>
       </div>
-      <PostList initialPosts={fetchedPosts} />
+      
+      {!fetchedPosts || fetchedPosts.length === 0 ? (
+        <p className="text-gray-500">아직 작성된 글이 없습니다. 첫 글을 작성해보세요!</p>
+      ) : (
+        <PostList initialPosts={fetchedPosts} />
+      )}
     </div>
   );
 }

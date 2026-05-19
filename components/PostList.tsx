@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -17,13 +17,6 @@ export default function PostList({ initialPosts }: PostListProps) {
       post.title.toLowerCase().includes(query.toLowerCase()) ||
       post.content.toLowerCase().includes(query.toLowerCase())
   );
-
-  const handleDelete = (e: React.MouseEvent, id: number) => {
-    e.preventDefault(); // Link 이벤트 전파 방지용 (Link 안의 삭제버튼인 경우)
-    if (window.confirm("정말 삭제하시겠습니까?")) {
-      setPosts(posts.filter((post) => post.id !== id));
-    }
-  };
 
   return (
     <div>
@@ -44,17 +37,11 @@ export default function PostList({ initialPosts }: PostListProps) {
           filteredPosts.map((post) => (
             <Link key={post.id} href={`/posts/${post.id}`} className="block">
               <div className="bg-white border text-gray-800 border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow relative">
-                <button
-                  onClick={(e) => handleDelete(e, post.id)}
-                  className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-sm px-2 py-1 border border-red-500 rounded"
-                >
-                  삭제
-                </button>
                 <h2 className="text-xl font-bold mb-2 pr-16">{post.title}</h2>
                 <p className="text-gray-600 mb-4 line-clamp-2">{post.content}</p>
                 <div className="flex justify-between text-sm text-gray-500">
-                  <span>작성자: {post.author}</span>
-                  <span>{post.date}</span>
+                  <span>작성자 ID: {post.user_id}</span>
+                  <span>{new Date(post.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             </Link>

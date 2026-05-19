@@ -1,31 +1,66 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 
-interface PostForm {
+interface EditPostForm {
   title: string;
   content: string;
 }
 
-export default function NewPostPage() {
+export default function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const { user, loading } = useAuth();
   const supabase = createClient();
   
-  const [form, setForm] = useState<PostForm>({ title: "", content: "" });
+  const [form, setForm] = useState<EditPostForm>({ title: "", content: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isFetching, setIsFetching] = useState(true);
 
-  // 로그인하지 않은 사용자는 로그인 페이지로 리다이렉트
+  // 데이터 로드 및 권한 체크
   useEffect(() => {
-    if (!loading && !user) {
-      alert("로그인이 필요한 서비스입니다.");
-      router.push("/login?redirect=/posts/new");
+    async function loadPost() {
+      if (loading) return;
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        router.push(`/login?redirect=/posts/${id}/edit`);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("posts")
+          .select("title, content, user_id")
+          .eq("id", id)
+          .single();
+
+        if (error || !data) {
+          throw new Error("게시글을 찾을 수 없습니다.");
+        }
+
+        // 클라이언트 if문을 사용한 UX적 분기. 실제 보안은 Ch11 RLS에서 처리합니다.
+        if (data.user_id !== user.id) {
+          alert("수정 권한이 없습니다.");
+          router.push(`/posts/${id}`);
+          return;
+        }
+
+        setForm({ title: data.title, content: data.content });
+      } catch (err: any) {
+        console.error(err);
+        alert(err.message || "데이터를 불러오는 중 오류가 발생했습니다.");
+        router.push("/posts");
+      } finally {
+        setIsFetching(false);
+      }
     }
-  }, [user, loading, router]);
+
+    loadPost();
+  }, [id, user, loading, router, supabase]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -34,7 +69,7 @@ export default function NewPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return; // 다시 한번 확인
+    if (!user) return; 
 
     if (!form.title.trim()) {
       setErrorMsg("제목을 입력해주세요.");
@@ -49,39 +84,35 @@ export default function NewPostPage() {
     setErrorMsg(null);
     
     try {
-      // 2. posts 테이블에 insert
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("posts")
-        .insert({
+        .update({
           title: form.title,
           content: form.content,
-          user_id: user.id, // 1. Ch9 AuthContext에서 가져온 user.id 사용
         })
-        .select()
-        .single();
+        .eq("id", id);
         
       if (error) throw error;
       
-      // 글 작성 성공 후 목록이나 상세 페이지로 이동
-      router.push(`/posts/${data.id}`);
-      router.refresh(); // 최신 목록을 위해 라우터 리프레시
+      alert("게시글이 수정되었습니다.");
+      router.push(`/posts/${id}`);
+      router.refresh(); 
       
     } catch (err: any) {
-      console.error("Error submitting post:", err);
-      setErrorMsg(err.message || "게시글 저장 중 오류가 발생했습니다.");
+      console.error("Error updating post:", err);
+      setErrorMsg(err.message || "게시글 수정 중 오류가 발생했습니다.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // 로딩 중이거나 아직 리다이렉트 전일 때
-  if (loading || !user) {
-    return <div className="mt-8 text-center">Loading...</div>;
+  if (loading || isFetching) {
+    return <div className="mt-8 text-center">데이터를 불러오는 중...</div>;
   }
 
   return (
     <div className="max-w-2xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-md border border-gray-200">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">새 글 쓰기</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">게시글 수정</h1>
       
       {errorMsg && (
         <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-md">
@@ -134,7 +165,7 @@ export default function NewPostPage() {
             disabled={isSubmitting}
             className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? "저장 중..." : "저장"}
+            {isSubmitting ? "수정 중..." : "수정"}
           </button>
         </div>
       </form>
