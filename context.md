@@ -8,7 +8,8 @@
   - Supabase 프로젝트 생성 및 마이그레이션 적용 (Ch8)
   - Supabase Auth 인증 구현 (로그인/회원가입, AuthProvider) (Ch9)
   - Supabase CRUD 구현 및 권한 검증 (Ch10)
-- 진행 중: RLS(Row Level Security) 설정 (Ch11)
+  - posts 테이블 RLS(Row Level Security) 마이그레이션 적용 (Ch11)
+- 진행 중: 없음
 - 미착수: 덧글/좋아요 기능(Ch12), 스토리지 추가(Ch13)
 
 ## 기술 결정 사항
@@ -40,7 +41,10 @@
 
 ### 보안 및 UX 정책
 - **작성자 UI 분기**: `user.id === post.user_id`를 비교하여 수정/삭제 버튼 노출 여부 결정.
-- **실제 보안**: 현재 클라이언트 UI 분기는 UX용이며, 실제 DB 보호는 Ch11 RLS에서 정책(Policy)으로 처리할 예정.
+- **실제 보안 (RLS)**: 클라이언트 UI 분기와는 별개로 Supabase 데이터베이스 레벨에서 정책(Policy)으로 원천 차단함 (Ch11 RLS).
+  - 적용 정책: SELECT 누구나, INSERT 로그인 본인, UPDATE 작성자 본인, DELETE 작성자 본인
+  - 마이그레이션 파일: `supabase/migrations/20260521053522_add_posts_rls.sql`
+  - 테스트 결과: 비로그인(게시판 조회 가능/작성 거부), 사용자 A(자신의 글 작성/수정/삭제 모두 성공), 사용자 B(A 작성 글 강제 수정/삭제 시도시 접근 불가로 방어 성공)
 - **예외 처리**: 게시글 작성 전 `profiles` 존재 여부를 확인하고, 없을 경우 자동 생성(`upsert`)하여 참조 무결성 오류(Foreign Key Error) 방지.
 
 ## 환경 설정 및 버전 관리

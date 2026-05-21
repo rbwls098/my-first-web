@@ -20,7 +20,12 @@ px shadcn init\) 및 컴포넌트 설치
 - [x] 신규 포스트 작성 기능 연결 (/posts/new/ Supabase Insert)
 - [x] 작성자 한정 포스트 수정/삭제 버튼 처리 (UX 분기)
 - [ ] 마이페이지 (/mypage) 구성 및 작성 글 목록 표시
-- [ ] RLS (Row Level Security) 설정 (Ch11)
+- [x] RLS (Row Level Security) 설정 (Ch11)
+  - [x] posts RLS 마이그레이션 생성
+  - [x] db push 적용
+  - [x] 다른 계정 우회 테스트
+  - [x] 보안 키 노출 grep
+  - [x] 빌드/배포 검증
 
 ## 4단계: 고급 기능 (Ch12)
 - [ ] 댓글 기능 (comments 테이블)

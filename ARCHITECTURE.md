@@ -30,6 +30,11 @@ Next.js App Router 기반의 라우팅 구조입니다.
 - **작성(Create)**: /posts/new에서 폼 작성 (useAuth로 사용자 ID 획득) -> 성공 시 상세 페이지 이동
 - **수정/삭제(Update/Delete)**: 본인 글인 경우에만 상세 페이지에서 `PostActions` 컴포넌트를 통해 수정/삭제 기능 활성화
 
+### 3.3. 보안 계층 (Ch11)
+- **UI 분기 (UX용)**: 프론트엔드 레벨에서 본인 글인 경우에만 `PostActions` 버튼 노출.
+- **RLS (DB 보안)**: `posts` 테이블 단위에서 보호.
+  - 보호 정책 목록: 누구나 SELECT 허용, 로그인한 본인(auth.uid() = user_id)에 대해서만 INSERT/UPDATE/DELETE 허용. 비정상적인 호출 완벽 차단.
+
 ---
 
 ## 4. 컴포넌트 구조
