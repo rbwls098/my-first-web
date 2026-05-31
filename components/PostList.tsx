@@ -41,7 +41,7 @@ export default function PostList({ initialPosts }: PostListProps) {
                 <p className="text-gray-600 mb-4 line-clamp-2">{post.content}</p>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>작성자 ID: {post.user_id}</span>
-                  <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                  <span>{new Date(post.created_at).toISOString().split('T')[0]}</span>
                 </div>
               </div>
             </Link>

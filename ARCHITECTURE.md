@@ -39,9 +39,10 @@ Next.js App Router 기반의 라우팅 구조입니다.
 
 ## 4. 컴포넌트 구조
 
-### 4.1. 공통 및 레이아웃
+### 4.1. 공통, 레이아웃 및 상태 UI
 - **MainLayout / Header / Footer**: 서비스 전역 레이아웃 및 네비게이션
 - **AuthProvider / useAuth**: 컨텍스트 기반 전역 세션 관리 훅
+- **error.tsx & loading.tsx**: 라우트별 로딩 스켈레톤 및 컴포넌트 에러 바운더리 관리 (Ch12)
 
 ### 4.2. 도메인 컴포넌트 (Ch10)
 - **PostList**: 게시글 배열을 받아 `Link`와 함께 목록 렌더링

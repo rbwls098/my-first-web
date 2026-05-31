@@ -46,6 +46,20 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(url);
   }
 
+  // 글 수정 페이지 접근 제한
+  if (!user && request.nextUrl.pathname.includes("/edit")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+  }
+
+  // 로그인된 사용자가 login/signup 접근 시 홈으로 리다이렉트
+  if (user && (request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/signup"))) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/posts";
+      return NextResponse.redirect(url);
+  }
+
   return supabaseResponse;
 }
 
@@ -53,5 +67,8 @@ export const config = {
   matcher: [
     "/posts/new(.*)",
     "/mypage/:path*",
+    "/posts/:path/edit",
+    "/login",
+    "/signup"
   ],
 };

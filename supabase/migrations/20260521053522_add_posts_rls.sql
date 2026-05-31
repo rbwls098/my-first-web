@@ -8,7 +8,7 @@ ON posts FOR SELECT
 USING (true);
 
 -- 2. INSERT 정책: 로그인 사용자만 가능, 자신의 글만 작성 가능
-DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON posts;
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON posts;    
 CREATE POLICY "Enable insert for authenticated users only"
 ON posts FOR INSERT
 WITH CHECK (auth.uid() = user_id);

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 interface PostActionsProps {
-  postId: number | string;
+  postId: string;
   isAuthor: boolean;
 }
 

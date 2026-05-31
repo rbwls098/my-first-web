@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
+import { getErrorMessage } from "@/lib/error-message";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -23,7 +24,8 @@ export default function LoginPage() {
     const { error: signInError } = await signInWithEmail(email, password);
 
     if (signInError) {
-      setError(signInError.message);
+      console.error("Login error:", signInError);
+      setError(getErrorMessage(signInError));
       setLoading(false);
     } else {
       router.push("/posts");

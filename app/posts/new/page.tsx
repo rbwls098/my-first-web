@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { getErrorMessage } from "@/lib/error-message";
 
 interface PostForm {
   title: string;
@@ -40,8 +41,16 @@ export default function NewPostPage() {
       setErrorMsg("제목을 입력해주세요.");
       return;
     }
+    if (form.title.trim().length < 2) {
+      setErrorMsg("제목을 2자 이상 입력해주세요.");
+      return;
+    }
     if (!form.content.trim()) {
       setErrorMsg("내용을 입력해주세요.");
+      return;
+    }
+    if (form.content.trim().length < 10) {
+      setErrorMsg("내용을 10자 이상 입력해주세요.");
       return;
     }
 
@@ -62,7 +71,7 @@ export default function NewPostPage() {
           .from("profiles")
           .upsert({
             id: user.id,
-            username: user.user_metadata?.name || user.email?.split("@")[0] || "User",
+            username: user.email?.split("@")[0] || "User",
           });
         
         if (profileCreateError) {
@@ -93,10 +102,7 @@ export default function NewPostPage() {
       
     } catch (err: any) {
       console.error("Error submitting post:", err);
-      const errorMessage = err.message || "게시글 저장 중 오류가 발생했습니다.";
-      const errorDetail = err.details ? ` (Detail: ${err.details})` : "";
-      const errorHint = err.hint ? ` (Hint: ${err.hint})` : "";
-      setErrorMsg(`${errorMessage}${errorDetail}${errorHint}`);
+      setErrorMsg(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

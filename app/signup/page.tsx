@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
+import { getErrorMessage } from "@/lib/error-message";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -25,7 +26,8 @@ export default function SignupPage() {
     const { error: signUpError } = await signUpWithEmail(email, password, name);
 
     if (signUpError) {
-      setError(signUpError.message);
+      console.error("Signup error:", signUpError);
+      setError(getErrorMessage(signUpError));
       setLoading(false);
     } else {
       setSuccess(true);
