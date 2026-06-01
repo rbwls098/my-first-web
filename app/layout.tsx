@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Navigation } from "@/components/Navigation";
 
 export const metadata: Metadata = {
@@ -16,15 +17,17 @@ export default function RootLayout({
   return (
     <html lang="ko" className="font-sans">
       <body>
-        <AuthProvider>
-          <Navigation />
-          <main className="max-w-4xl mx-auto p-6">
-            {children}
-          </main>
-          <footer className="text-center text-gray-500 py-4 mt-8">
-            &copy; 2026 내 블로그
-          </footer>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <Navigation />
+            <main className="max-w-4xl mx-auto p-4 md:p-6">
+              {children}
+            </main>
+            <footer className="text-center text-gray-500 py-4 mt-8">
+              &copy; 2026 내 블로그
+            </footer>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

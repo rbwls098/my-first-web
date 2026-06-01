@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 
 // 테스트 전 더미 환경 변수 확인
 // 실행 시 $env:TEST_EMAIL="test@example.com"; $env:TEST_PASSWORD="password" npx playwright test 처럼 실행
-const TEST_EMAIL = process.env.TEST_EMAIL || 'test@example.com';
 const TEST_PASSWORD = process.env.TEST_PASSWORD || 'password123';
 
 test.describe('Auth and CRUD Flow', () => {

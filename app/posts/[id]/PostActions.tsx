@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { getErrorMessage } from "@/lib/error-message";
 
 interface PostActionsProps {
   postId: string;
@@ -34,9 +35,9 @@ export default function PostActions({ postId, isAuthor }: PostActionsProps) {
       alert("게시글이 삭제되었습니다.");
       router.push("/posts");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error deleting post:", err);
-      alert(err.message || "게시글 삭제 중 오류가 발생했습니다.");
+      alert(getErrorMessage(err));
     } finally {
       setIsDeleting(false);
     }

@@ -100,7 +100,7 @@ export default function NewPostPage() {
       router.push(`/posts/${data.id}`);
       router.refresh(); // 최신 목록을 위해 라우터 리프레시
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error submitting post:", err);
       setErrorMsg(getErrorMessage(err));
     } finally {

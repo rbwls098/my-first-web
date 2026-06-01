@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { getErrorMessage } from "@/lib/error-message";
 
 interface EditPostForm {
   title: string;
@@ -50,9 +51,9 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         }
 
         setForm({ title: data.title, content: data.content });
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        alert(err.message || "데이터를 불러오는 중 오류가 발생했습니다.");
+        alert(getErrorMessage(err));
         router.push("/posts");
       } finally {
         setIsFetching(false);
@@ -98,9 +99,9 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       router.push(`/posts/${id}`);
       router.refresh(); 
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error updating post:", err);
-      setErrorMsg(err.message || "게시글 수정 중 오류가 발생했습니다.");
+      setErrorMsg(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

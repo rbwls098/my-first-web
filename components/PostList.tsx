@@ -9,7 +9,7 @@ interface PostListProps {
 }
 
 export default function PostList({ initialPosts }: PostListProps) {
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [posts] = useState<Post[]>(initialPosts);
   const [query, setQuery] = useState("");
 
   const filteredPosts = posts.filter(

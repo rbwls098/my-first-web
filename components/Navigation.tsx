@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Navigation() {
   const { user, loading, signOut } = useAuth();
@@ -15,11 +16,11 @@ export function Navigation() {
 
   return (
     <nav className="bg-gray-800 text-white p-4">
-      <div className="max-w-4xl mx-auto flex items-center justify-between">
+      <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
         <Link href="/" className="font-bold text-lg hover:text-gray-300">
           내 블로그
         </Link>
-        <div className="space-x-4 flex items-center">
+        <div className="flex flex-wrap items-center gap-3 text-sm md:text-base">
           <Link href="/" className="hover:text-gray-300">홈</Link>
           <Link href="/posts" className="hover:text-gray-300">블로그</Link>
           
@@ -30,7 +31,7 @@ export function Navigation() {
               <Link href="/posts/new" className="hover:text-gray-300 transform transition-colors">새 글 쓰기</Link>
               <button 
                 onClick={handleSignOut} 
-                className="hover:text-gray-300 ml-4 font-medium transition-colors cursor-pointer"
+                className="hover:text-gray-300 ml-2 font-medium transition-colors cursor-pointer"
               >
                 로그아웃
               </button>
@@ -41,6 +42,10 @@ export function Navigation() {
               <Link href="/signup" className="hover:text-gray-300">회원가입</Link>
             </>
           )}
+          
+          <div className="border-l border-gray-600 pl-3 ml-1">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </nav>

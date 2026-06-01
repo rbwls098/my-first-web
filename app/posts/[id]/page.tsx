@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import PostActions from "./PostActions";
+import CommentForm from "./CommentForm";
+import CommentItem from "./CommentItem";
+import LikeButton from "./LikeButton";
 
 export const revalidate = 0;
 
@@ -22,6 +25,13 @@ export default async function PostDetailPage({
     .eq("id", id)
     .single();
     
+  // 댓글 조회
+  const { data: comments } = await supabase
+    .from("comments")
+    .select("id, content, created_at, user_id")
+    .eq("post_id", id)
+    .order("created_at", { ascending: true });
+
   // 3. 없는 글인 경우 notFound() 처리
   if (error || !post) {
     notFound();
@@ -41,11 +51,13 @@ export default async function PostDetailPage({
         <span>작성자 ID: {post.user_id}</span>
         <span>작성일: {new Date(post.created_at).toLocaleDateString()}</span>
       </div>
-      <p className="text-gray-700 text-lg mb-8 whitespace-pre-wrap">
+      <p className="text-gray-900 text-lg mb-8 whitespace-pre-wrap">
         {post.content}
       </p>
 
       <div className="mt-8 flex justify-between items-center">
+        <LikeButton postId={post.id} userId={user?.id} />
+        
         <Link
           href="/posts"
           className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -55,6 +67,24 @@ export default async function PostDetailPage({
         
         {/* 클라이언트 if문을 사용한 UX적 분기. 실제 보안은 Ch11 RLS에서 처리합니다. */}
         <PostActions postId={post.id} isAuthor={isAuthor} />
+      </div>
+
+      <div className="mt-12 border-t pt-8">
+        <h2 className="text-xl font-bold mb-4">댓글</h2>
+        {comments && comments.length > 0 ? (
+          <ul className="space-y-4">
+            {comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                isOwner={user?.id === comment.user_id}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-600">등록된 댓글이 없습니다.</p>
+        )}
+        <CommentForm postId={post.id} />
       </div>
     </article>
   );
