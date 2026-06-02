@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 
 export default function LikeButton({ postId, userId }: { postId: string; userId: string | undefined }) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {

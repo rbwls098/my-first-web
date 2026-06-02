@@ -4,20 +4,31 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
+interface Comment {
+  id: string;
+  content: string;
+  user_id: string;
+  created_at: string;
+}
+
 export default function CommentItem({
   comment,
   isOwner,
 }: {
-  comment: any;
+  comment: Comment;
   isOwner: boolean;
 }) {
   const router = useRouter();
-  const [dateString, setDateString] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
-  // 클라이언트 마운트 이후에만 날짜 포맷팅 실행
   useEffect(() => {
-    setDateString(new Date(comment.created_at).toLocaleString());
-  }, [comment.created_at]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
+  const dateString = isMounted 
+    ? new Date(comment.created_at).toLocaleString()
+    : "...";
 
   const handleDelete = async () => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
@@ -40,7 +51,7 @@ export default function CommentItem({
       <div>
         <p className="text-gray-900">{comment.content}</p>
         <div className="text-xs text-gray-500 mt-2">
-          작성자: {comment.user_id} | {dateString || "..."}
+          작성자: {comment.user_id} | {dateString}
         </div>
       </div>
       {isOwner && (

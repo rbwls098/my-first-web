@@ -45,47 +45,64 @@ export default async function PostDetailPage({
   const isAuthor = user?.id === post.user_id;
 
   return (
-    <article className="mt-8 bg-white p-6 rounded-lg shadow-md border border-gray-200">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">{post.title}</h1>
-      <div className="text-sm text-gray-500 mb-6 flex space-x-4">
-        <span>작성자 ID: {post.user_id}</span>
-        <span>작성일: {new Date(post.created_at).toLocaleDateString()}</span>
-      </div>
-      <p className="text-gray-900 text-lg mb-8 whitespace-pre-wrap">
-        {post.content}
-      </p>
+    <div className="max-w-3xl mx-auto px-4 py-16">
+      <article className="space-y-8">
+        <header className="space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-foreground leading-tight">
+            {post.title}
+          </h1>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground font-medium">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-blue-500" />
+              {post.user_id.slice(0, 8)}
+            </span>
+            <span className="text-border">|</span>
+            <span>{new Date(post.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          </div>
+        </header>
 
-      <div className="mt-8 flex justify-between items-center">
-        <LikeButton postId={post.id} userId={user?.id} />
-        
-        <Link
-          href="/posts"
-          className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          목록으로 돌아가기
-        </Link>
-        
-        {/* 클라이언트 if문을 사용한 UX적 분기. 실제 보안은 Ch11 RLS에서 처리합니다. */}
-        <PostActions postId={post.id} isAuthor={isAuthor} />
-      </div>
+        <div className="prose prose-lg dark:prose-invert max-w-none">
+          <p className="text-xl leading-relaxed text-foreground/90 whitespace-pre-wrap font-light">
+            {post.content}
+          </p>
+        </div>
 
-      <div className="mt-12 border-t pt-8">
-        <h2 className="text-xl font-bold mb-4">댓글</h2>
-        {comments && comments.length > 0 ? (
-          <ul className="space-y-4">
-            {comments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                isOwner={user?.id === comment.user_id}
-              />
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-600">등록된 댓글이 없습니다.</p>
-        )}
-        <CommentForm postId={post.id} />
-      </div>
-    </article>
+        <div className="pt-12 border-t border-border/40 flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-6">
+            <LikeButton postId={post.id} userId={user?.id} />
+            <PostActions postId={post.id} isAuthor={isAuthor} />
+          </div>
+          
+          <Link
+            href="/posts"
+            className="text-blue-500 font-medium hover:underline flex items-center gap-1"
+          >
+            ← 목록으로 돌아가기
+          </Link>
+        </div>
+
+        <section className="mt-20 pt-12 border-t border-border/40">
+          <h2 className="text-2xl font-bold tracking-tighter mb-8">댓글</h2>
+          <CommentForm postId={post.id} />
+          <div className="mt-10">
+            {comments && comments.length > 0 ? (
+              <ul className="divide-y divide-border/40">
+                {comments.map((comment) => (
+                  <CommentItem
+                    key={comment.id}
+                    comment={comment}
+                    isOwner={user?.id === comment.user_id}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground py-10 text-center bg-muted/10 rounded-2xl border border-dashed border-border/60">
+                첫 번째 댓글을 남겨보세요.
+              </p>
+            )}
+          </div>
+        </section>
+      </article>
+    </div>
   );
 }

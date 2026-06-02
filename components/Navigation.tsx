@@ -15,35 +15,34 @@ export function Navigation() {
   };
 
   return (
-    <nav className="bg-gray-800 text-white p-4">
-      <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
-        <Link href="/" className="font-bold text-lg hover:text-gray-300">
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/40 transition-all duration-300">
+      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+        <Link href="/" className="font-semibold text-lg tracking-tighter hover:opacity-70 transition-opacity">
           내 블로그
         </Link>
-        <div className="flex flex-wrap items-center gap-3 text-sm md:text-base">
-          <Link href="/" className="hover:text-gray-300">홈</Link>
-          <Link href="/posts" className="hover:text-gray-300">블로그</Link>
+        <div className="flex items-center gap-6 text-sm font-medium">
+          <Link href="/posts" className="text-foreground/80 hover:text-foreground transition-colors">블로그</Link>
           
           {loading ? (
-            <span className="text-gray-400 text-sm">로딩 중...</span>
+            <span className="text-muted-foreground animate-pulse text-xs">로딩 중...</span>
           ) : user ? (
             <>
-              <Link href="/posts/new" className="hover:text-gray-300 transform transition-colors">새 글 쓰기</Link>
+              <Link href="/posts/new" className="text-foreground/80 hover:text-foreground transition-colors">새 글 쓰기</Link>
               <button 
                 onClick={handleSignOut} 
-                className="hover:text-gray-300 ml-2 font-medium transition-colors cursor-pointer"
+                className="text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
               >
                 로그아웃
               </button>
             </>
           ) : (
             <>
-              <Link href="/login" className="hover:text-gray-300">로그인</Link>
-              <Link href="/signup" className="hover:text-gray-300">회원가입</Link>
+              <Link href="/login" className="text-foreground/80 hover:text-foreground transition-colors">로그인</Link>
+              <Link href="/signup" className="text-foreground/80 hover:text-foreground transition-colors">회원가입</Link>
             </>
           )}
           
-          <div className="border-l border-gray-600 pl-3 ml-1">
+          <div className="pl-2">
             <ThemeToggle />
           </div>
         </div>

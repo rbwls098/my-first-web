@@ -15,7 +15,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -35,6 +35,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // 로그인된 사용자가 /login 또는 /signup에 접근하려고 하면 /posts로 리다이렉트
+  if (
+    user &&
+    (request.nextUrl.pathname.startsWith('/login') ||
+      request.nextUrl.pathname.startsWith('/signup'))
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/posts'
+    return NextResponse.redirect(url)
+  }
+
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
@@ -44,8 +55,11 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname !== '/posts' &&
     !request.nextUrl.pathname.startsWith('/posts/') // 상세 페이지는 누구나 볼 수 있다고 가정 (RLS가 처리)
   ) {
-    // '/posts/new' 같은 경로는 로그인이 필요함
-    if (request.nextUrl.pathname === '/posts/new') {
+    // '/posts/new' 또는 수정 페이지('/edit') 같은 경로는 로그인이 필요함
+    if (
+      request.nextUrl.pathname === '/posts/new' ||
+      request.nextUrl.pathname.includes('/edit')
+    ) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
       url.searchParams.set('redirect', request.nextUrl.pathname)
