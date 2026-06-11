@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -42,15 +42,27 @@ export default function PostList({ initialPosts }: PostListProps) {
           </div>
         ) : (
           filteredPosts.map((post) => (
-            <Link key={post.id} href={`` + `/posts/${post.id}`} className="group block">
-              <div className="h-full bg-card border border-border/40 rounded-[2rem] p-8 flex flex-col justify-between hover:border-blue-500/30 hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5 transition-all duration-500 hover:-translate-y-1">
-                <div>
-                  <h2 className="text-2xl font-bold tracking-tighter mb-4 group-hover:text-blue-500 transition-colors line-clamp-2">{post.title}</h2>
-                  <p className="text-muted-foreground mb-8 line-clamp-3 leading-relaxed font-light">{post.content}</p>
-                </div>
-                <div className="flex justify-between items-center text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">
-                  <span>{post.user_id.slice(0, 8)}</span>
-                  <span>{new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+            <Link key={post.id} href={`/posts/${post.id}`} className="group block">
+              <div className="h-full bg-card border border-border/40 rounded-[2rem] overflow-hidden flex flex-col hover:border-blue-500/30 hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5 transition-all duration-500 hover:-translate-y-1">
+                {post.image_url && (
+                  <div className="relative w-full h-48 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                )}
+                <div className="p-8 flex flex-col flex-1 justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold tracking-tighter mb-4 group-hover:text-blue-500 transition-colors line-clamp-2">{post.title}</h2>
+                    <p className="text-muted-foreground mb-8 line-clamp-3 leading-relaxed font-light">{post.content}</p>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+                    <span>{post.user_id.slice(0, 8)}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                  </div>
                 </div>
               </div>
             </Link>

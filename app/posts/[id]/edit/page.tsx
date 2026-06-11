@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,9 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
   const supabase = createClient();
   
   const [form, setForm] = useState<EditPostForm>({ title: "", content: "" });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState(true);
@@ -35,7 +38,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
       try {
         const { data, error } = await supabase
           .from("posts")
-          .select("title, content, user_id")
+          .select("title, content, user_id, image_url")
           .eq("id", id)
           .single();
 
@@ -43,7 +46,6 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
           throw new Error("게시글을 찾을 수 없습니다.");
         }
 
-        // 클라이언트 if문을 사용한 UX적 분기. 실제 보안은 Ch11 RLS에서 처리합니다.
         if (data.user_id !== user.id) {
           alert("수정 권한이 없습니다.");
           router.push(`/posts/${id}`);
@@ -51,6 +53,8 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         }
 
         setForm({ title: data.title, content: data.content });
+        setExistingImageUrl(data.image_url);
+        setImagePreview(data.image_url);
       } catch (err: unknown) {
         console.error(err);
         alert(getErrorMessage(err));
@@ -66,6 +70,18 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setForm({ ...form, [id]: value });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,11 +101,32 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
     setErrorMsg(null);
     
     try {
+      let imageUrl = existingImageUrl;
+
+      if (imageFile) {
+        const fileExt = imageFile.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("post-images")
+          .upload(filePath, imageFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("post-images")
+          .getPublicUrl(filePath);
+        
+        imageUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from("posts")
         .update({
           title: form.title,
           content: form.content,
+          image_url: imageUrl,
         })
         .eq("id", id);
         
@@ -132,9 +169,45 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
             value={form.title}
             onChange={handleChange}
             disabled={isSubmitting}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 text-gray-900"
             placeholder="제목을 입력하세요"
           />
+        </div>
+
+        <div>
+          <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+            이미지 수정
+          </label>
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            disabled={isSubmitting}
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 disabled:opacity-50"
+          />
+          {imagePreview && (
+            <div className="mt-4 relative w-full h-64 border rounded-md overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imagePreview}
+                alt="미리보기"
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setImageFile(null);
+                  setImagePreview(existingImageUrl);
+                }}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
         
         <div>
@@ -147,7 +220,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
             onChange={handleChange}
             disabled={isSubmitting}
             rows={8}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y disabled:opacity-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y disabled:opacity-50 text-gray-900"
             placeholder="내용을 입력하세요"
           />
         </div>

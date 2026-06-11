@@ -9,7 +9,7 @@ export default async function PostsPage() {
   const supabase = await createClient();
   const { data: posts, error } = await supabase
     .from("posts")
-    .select("id, title, content, created_at, user_id")
+    .select("id, title, content, created_at, user_id, image_url")
     .order("created_at", { ascending: false });
 
   if (error) {

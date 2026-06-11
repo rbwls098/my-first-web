@@ -21,7 +21,7 @@ export default async function PostDetailPage({
   // 1. posts 테이블에서 id로 단일 데이터 조회 (조회할 컬럼 지정)
   const { data: post, error } = await supabase
     .from("posts")
-    .select("id, title, content, created_at, user_id")
+    .select("id, title, content, created_at, user_id, image_url")
     .eq("id", id)
     .single();
     
@@ -60,6 +60,17 @@ export default async function PostDetailPage({
             <span>{new Date(post.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
         </header>
+
+        {post.image_url && (
+          <div className="relative w-full rounded-2xl overflow-hidden border border-border/40 shadow-lg">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.image_url}
+              alt={post.title}
+              className="w-full h-auto object-cover max-h-[500px]"
+            />
+          </div>
+        )}
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
           <p className="text-xl leading-relaxed text-foreground/90 whitespace-pre-wrap font-light">
